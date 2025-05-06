@@ -23,6 +23,7 @@ def convert_hyphen_to_underscore(field_name: str) -> str:
     """Replace underscores with hyphens in field names."""
     return field_name.replace("_", "-")
 
+
 # Define the input schema using Pydantic
 class SalaryInput(BaseModel):
     age: int = Field(..., example=39)
@@ -65,10 +66,10 @@ def lifespan(app: FastAPI):
         yield  # Resources are ready to use
 
     except FileNotFoundError as error:
-        print("Error:", error) 
+        print("Error:", error)
         raise RuntimeError(f"File not found: {error.filename}")
     except Exception as error:
-        print("Error:", error) 
+        print("Error:", error)
         raise RuntimeError(f"Error loading model or preprocessing objects: {error}")
 
 
@@ -77,14 +78,16 @@ app = FastAPI(
     title="Salary Prediction API",
     description="An API to predict if a person's salary exceeds $50K based on their attributes.",
     version="1.0.0",
-    lifespan=lifespan
+    lifespan=lifespan,
 )
+
 
 # Root endpoint
 @app.get("/")
 async def root():
     """Root endpoint to verify the API is running."""
     return {"message": "Welcome to the Salary Prediction API!"}
+
 
 # Prediction endpoint
 @app.post("/predict")
@@ -112,5 +115,13 @@ async def predict_salary(input_data: SalaryInput):
         return {"salary_prediction": salary_category.strip()}
 
     except Exception as error:
-        print("Error:", error) 
+        print("Error:", error)
         raise HTTPException(status_code=500, detail=f"Prediction error: {error}")
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    # Get the port from the environment variable or use 8000 as default
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)

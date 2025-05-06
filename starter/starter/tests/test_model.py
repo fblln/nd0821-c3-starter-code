@@ -2,8 +2,11 @@ import pytest
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.preprocessing import OneHotEncoder, LabelBinarizer
-from starter.ml.model import train_model, compute_model_metrics, inference, evaluate_slices
+from starter.ml.model import (
+    train_model,
+    compute_model_metrics,
+    inference,
+)
 
 
 @pytest.fixture
@@ -38,7 +41,7 @@ def test_compute_model_metrics():
     preds = np.array([1, 0, 0, 1])
     precision, recall, fbeta = compute_model_metrics(y, preds)
     print(f"Precision: {precision}, Recall: {recall}, F-beta: {fbeta}")
-    
+
     assert precision is not None
     assert recall is not None
     assert fbeta is not None

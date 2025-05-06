@@ -15,10 +15,12 @@ data = {
     "capital_gain": 0,
     "capital_loss": 0,
     "hours_per_week": 40,
-    "native-country": "United-States"
+    "native-country": "United-States",
 }
 
-response = requests.post('https://fabio-ellena-predict-salary.onrender.com/predict', data=json.dumps(data))
+response = requests.post(
+    "https://fabio-ellena-predict-salary.onrender.com/predict", data=json.dumps(data)
+)
 
 print(response.status_code)
 print(response.json())

@@ -2,6 +2,7 @@ from sklearn.metrics import fbeta_score, precision_score, recall_score
 from sklearn.ensemble import RandomForestClassifier
 from .data import process_data
 
+
 # Optional: implement hyperparameter tuning.
 def train_model(X_train, y_train):
     """
@@ -21,11 +22,11 @@ def train_model(X_train, y_train):
     # Define a small Random Forest model
     model = RandomForestClassifier(
         n_estimators=10,  # Small number of trees
-        max_depth=5,      # Limit the depth of each tree
-        random_state=42   # For reproducibility
+        max_depth=5,  # Limit the depth of each tree
+        random_state=42,  # For reproducibility
     )
     model.fit(X_train, y_train)
-    
+
     return model
 
 
@@ -52,7 +53,7 @@ def compute_model_metrics(y, preds):
 
 
 def inference(model, X):
-    """ Run model inferences and return the predictions.
+    """Run model inferences and return the predictions.
 
     Inputs
     ------
@@ -67,6 +68,7 @@ def inference(model, X):
     """
     predictions = model.predict(X)
     return predictions
+
 
 def evaluate_slices(model, encoder, lb, X, categorical_features, label):
     """
@@ -107,7 +109,7 @@ def evaluate_slices(model, encoder, lb, X, categorical_features, label):
                 label=label,
                 training=False,
                 encoder=encoder,
-                lb=lb
+                lb=lb,
             )
 
             # Generate predictions
@@ -120,7 +122,7 @@ def evaluate_slices(model, encoder, lb, X, categorical_features, label):
             column_metrics[category] = {
                 "precision": precision,
                 "recall": recall,
-                "fbeta": fbeta
+                "fbeta": fbeta,
             }
 
         # Add metrics for the current column to the result

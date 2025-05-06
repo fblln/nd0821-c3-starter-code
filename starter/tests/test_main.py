@@ -5,11 +5,13 @@ from main import app
 # Create a test client
 client = TestClient(app)
 
+
 @pytest.fixture(scope="module", autouse=True)
 def initialize_lifespan():
     """Manually trigger the lifespan context manager for the app."""
     with client as test_client:
         yield test_client
+
 
 # Mock data for testing
 valid_input_data = {
@@ -26,7 +28,7 @@ valid_input_data = {
     "capital_gain": 80000,
     "capital_loss": 0,
     "hours_per_week": 60,
-    "native-country": "United-States"
+    "native-country": "United-States",
 }
 
 # Mock data for testing the other possible output
@@ -44,8 +46,9 @@ alternative_input_data = {
     "capital_gain": 0,
     "capital_loss": 0,
     "hours_per_week": 40,
-    "native-country": "United-States"
+    "native-country": "United-States",
 }
+
 
 def test_root_endpoint():
     """Test the GET method for the root endpoint."""

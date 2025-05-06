@@ -6,6 +6,7 @@ from sklearn.model_selection import train_test_split
 from ml.data import process_data
 from ml.model import evaluate_slices, train_model, compute_model_metrics, inference
 
+
 def main():
     # Load the data
     data = pd.read_csv("data/census.csv")
@@ -32,7 +33,12 @@ def main():
 
     # Process the test data
     X_test, y_test, _, _ = process_data(
-        test, categorical_features=cat_features, label="salary", training=False, encoder=encoder, lb=lb
+        test,
+        categorical_features=cat_features,
+        label="salary",
+        training=False,
+        encoder=encoder,
+        lb=lb,
     )
 
     # Train the model
@@ -41,7 +47,9 @@ def main():
     # Evaluate the model
     preds = inference(model, X_test)
     precision, recall, fbeta = compute_model_metrics(y_test, preds)
-    print(f"Model Performance:\nPrecision: {precision}\nRecall: {recall}\nF1 Score: {fbeta}")
+    print(
+        f"Model Performance:\nPrecision: {precision}\nRecall: {recall}\nF1 Score: {fbeta}"
+    )
 
     # Evaluate model performance on slices of the data
     print("\nEvaluating model performance on data slices:")
@@ -51,7 +59,7 @@ def main():
         lb=lb,
         X=test,
         categorical_features=cat_features,
-        label="salary"
+        label="salary",
     )
 
     # Print the results
@@ -72,6 +80,7 @@ def main():
 
     with open("model/lb.pkl", "wb") as lb_file:
         pickle.dump(lb, lb_file)
+
 
 if __name__ == "__main__":
     main()
