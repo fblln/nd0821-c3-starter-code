@@ -1,3 +1,4 @@
+import pathlib
 from fastapi import FastAPI, HTTPException
 import pandas as pd
 import pickle
@@ -49,18 +50,19 @@ class SalaryInput(BaseModel):
 # Lifespan context manager for resource initialization
 def lifespan(app: FastAPI):
     global model, encoder, label_binarizer
+    base = pathlib.Path(__file__).parent / "model"
     try:
         # Load the model
-        with open("model/model.pkl", "rb") as model_file:
+        with open(base/"model.pkl", "rb") as model_file:
             model = pickle.load(model_file)
             print(model)
 
         # Load the encoder
-        with open("model/encoder.pkl", "rb") as encoder_file:
+        with open(base/"encoder.pkl", "rb") as encoder_file:
             encoder = pickle.load(encoder_file)
             print(encoder)
         # Load the label binarizer
-        with open("model/lb.pkl", "rb") as lb_file:
+        with open(base/"lb.pkl", "rb") as lb_file:
             label_binarizer = pickle.load(lb_file)
             print(label_binarizer)
         yield  # Resources are ready to use
