@@ -43,8 +43,8 @@ jobs:
           # Fail the build if there are Python linting issues
           flake8 . --count --exit-zero --max-line-length=150 
           
-      # Run tests using pytest
+      # Change directory to ./starter and run tests using pytest
       - name: Run tests with pytest
+        working-directory: ./starter
         run: |
-          cd ./starter
           python -m pytest -s -vv
