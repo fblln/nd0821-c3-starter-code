@@ -64,9 +64,11 @@ def lifespan(app: FastAPI):
             print(label_binarizer)
         yield  # Resources are ready to use
 
-    except FileNotFoundError as e:
-        raise RuntimeError(f"File not found: {e.filename}")
+    except FileNotFoundError as error:
+        print("Error:", error) 
+        raise RuntimeError(f"File not found: {error.filename}")
     except Exception as error:
+        print("Error:", error) 
         raise RuntimeError(f"Error loading model or preprocessing objects: {error}")
 
 
@@ -110,4 +112,5 @@ async def predict_salary(input_data: SalaryInput):
         return {"salary_prediction": salary_category.strip()}
 
     except Exception as error:
+        print("Error:", error) 
         raise HTTPException(status_code=500, detail=f"Prediction error: {error}")
