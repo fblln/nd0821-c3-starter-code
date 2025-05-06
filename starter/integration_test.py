@@ -18,7 +18,7 @@ data = {
     "native-country": "United-States"
 }
 
-response = requests.post('http://127.0.0.1:8000/predict', data=json.dumps(data))
+response = requests.post('https://fabio-ellena-predict-salary.onrender.com/predict', data=json.dumps(data))
 
 print(response.status_code)
 print(response.json())
