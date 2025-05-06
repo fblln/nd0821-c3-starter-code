@@ -8,7 +8,7 @@ def initialize_lifespan():
     global client
     with TestClient(app) as test_client:
         client = test_client   # replace the old client
-        yield
+        yield client
 
 
 # Mock data for testing
