@@ -1,4 +1,5 @@
 import pathlib
+import sys
 from fastapi import FastAPI, HTTPException
 import pandas as pd
 import pickle
@@ -46,42 +47,30 @@ class SalaryInput(BaseModel):
         alias_generator = convert_hyphen_to_underscore
         populate_by_name = True
 
-
-# Lifespan context manager for resource initialization
-def lifespan(app: FastAPI):
-    global model, encoder, label_binarizer
-    base = pathlib.Path(__file__).parent / "model"
-    try:
-        # Load the model
-        with open(base/"model.pkl", "rb") as model_file:
-            model = pickle.load(model_file)
-            print(model)
-
-        # Load the encoder
-        with open(base/"encoder.pkl", "rb") as encoder_file:
-            encoder = pickle.load(encoder_file)
-            print(encoder)
-        # Load the label binarizer
-        with open(base/"lb.pkl", "rb") as lb_file:
-            label_binarizer = pickle.load(lb_file)
-            print(label_binarizer)
-        yield  # Resources are ready to use
-
-    except FileNotFoundError as error:
-        print("Error:", error)
-        raise RuntimeError(f"File not found: {error.filename}")
-    except Exception as error:
-        print("Error:", error)
-        raise RuntimeError(f"Error loading model or preprocessing objects: {error}")
+BASE_DIR = pathlib.Path(__file__).parent
 
 
 # Initialize the FastAPI app
 app = FastAPI(
     title="Salary Prediction API",
     description="An API to predict if a person's salary exceeds $50K based on their attributes.",
-    version="1.0.0",
-    lifespan=lifespan,
+    version="1.0.0"
 )
+
+@app.on_event("startup")
+def load_artifacts():
+    global model, encoder, label_binarizer
+    print("[STARTUP] loading model artifacts…", file=sys.stderr)
+    model_path   = BASE_DIR / "model" / "model.pkl"
+    encoder_path = BASE_DIR / "model" / "encoder.pkl"
+    lb_path      = BASE_DIR / "model" / "lb.pkl"
+
+    # these opens should succeed in CI if the files are in place
+    with open(model_path, "rb")   as f: model = pickle.load(f)
+    with open(encoder_path, "rb") as f: encoder = pickle.load(f)
+    with open(lb_path, "rb")      as f: label_binarizer = pickle.load(f)
+    print("[STARTUP] done loading model, encoder, lb", file=sys.stderr)
+
 
 
 # Root endpoint

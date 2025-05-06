@@ -3,13 +3,11 @@ from fastapi.testclient import TestClient
 from main import app
 
 
-@pytest.fixture(scope="module", autouse=True)
-def initialize_lifespan():
-    global client
-    with TestClient(app) as test_client:
-        client = test_client   # replace the old client
-        yield client
-
+@pytest.fixture(scope="module")
+def client():
+    # Enter the TestClient context, which will fire @startup:
+    with TestClient(app) as c:
+        yield c
 
 # Mock data for testing
 valid_input_data = {
@@ -48,21 +46,21 @@ alternative_input_data = {
 }
 
 
-def test_root_endpoint():
+def test_root_endpoint(client):
     """Test the GET method for the root endpoint."""
     response = client.get("/")
     assert response.status_code == 200
     assert response.json() == {"message": "Welcome to the Salary Prediction API!"}
 
 
-def test_predict_salary_above_50k():
+def test_predict_salary_above_50k(client):
     """Test the POST /predict endpoint for a salary prediction >50K."""
     response = client.post("/predict", json=valid_input_data)
     assert response.status_code == 200
     assert response.json() == {"salary_prediction": ">50K"}
 
 
-def test_predict_salary_below_50k():
+def test_predict_salary_below_50k(client):
     """Test the POST /predict endpoint for a salary prediction <=50K."""
     response = client.post("/predict", json=alternative_input_data)
     assert response.status_code == 200
