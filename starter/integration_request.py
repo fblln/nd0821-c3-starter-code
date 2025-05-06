@@ -6,7 +6,7 @@ data = {
     "workclass": "Self-emp-not-inc",
     "fnlgt": 83311,
     "education": "HS-grad",
-    "education_num": 9,
+    "education-num": 9,
     "marital-status": "Married-civ-spouse",
     "occupation": "Craft-repair",
     "relationship": "Husband",
