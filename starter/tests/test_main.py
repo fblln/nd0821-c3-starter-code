@@ -2,15 +2,13 @@ import pytest
 from fastapi.testclient import TestClient
 from main import app
 
-# Create a test client
-client = TestClient(app)
-
 
 @pytest.fixture(scope="module", autouse=True)
 def initialize_lifespan():
-    """Manually trigger the lifespan context manager for the app."""
-    with client as test_client:
-        yield test_client
+    global client
+    with TestClient(app) as test_client:
+        client = test_client   # replace the old client
+        yield
 
 
 # Mock data for testing
