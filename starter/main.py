@@ -117,11 +117,3 @@ async def predict_salary(input_data: SalaryInput):
     except Exception as error:
         print("Error:", error)
         raise HTTPException(status_code=500, detail=f"Prediction error: {error}")
-
-
-if __name__ == "__main__":
-    import uvicorn
-
-    # Get the port from the environment variable or use 8000 as default
-    port = int(os.getenv("PORT", 8000))
-    uvicorn.run(app, host="0.0.0.0", port=port)

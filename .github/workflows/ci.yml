@@ -1,0 +1,50 @@
+# Continuous Integration workflow for Python project
+
+name: ci
+
+# Define when the workflow will be triggered
+on:
+  # Trigger on push or pull request events for the main branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  # Allow manual triggering from the Actions tab
+  workflow_dispatch:
+
+# Define the jobs in the workflow
+jobs:
+  # Job to build, lint, and test the project
+  build:
+    # Specify the runner environment
+    runs-on: ubuntu-latest
+
+    # Define the sequence of steps for the job
+    steps:
+      # Check out the repository to the runner
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      # Set up the Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.10
+
+      # Install project dependencies if requirements.txt exists
+      - name: Install dependencies
+        run: |
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          
+      # Run flake8 to check Python code style
+      - name: Lint with flake8
+        run: |
+          # Fail the build if there are Python linting issues
+          flake8 . --count --exit-zero --max-line-length=150 
+          
+      # Run tests using pytest
+      - name: Run tests with pytest
+        run: |
+          cd ./starter
+          python -m pytest -vv
