@@ -42,7 +42,10 @@ jobs:
         run: |
           # Fail the build if there are Python linting issues
           flake8 . --count --exit-zero --max-line-length=150 
-          
+
+      - name: Set file permissions
+        run: chmod -R 755 ./starter/model/
+        
       # Change directory to ./starter and run tests using pytest
       - name: Run tests with pytest
         working-directory: ./starter
