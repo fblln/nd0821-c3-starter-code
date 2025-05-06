@@ -35,7 +35,7 @@ jobs:
       # Install project dependencies if requirements.txt exists
       - name: Install dependencies
         run: |
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f ./starter/requirements.txt ]; then pip install -r ./starter/requirements.txt; fi
           
       # Run flake8 to check Python code style
       - name: Lint with flake8
