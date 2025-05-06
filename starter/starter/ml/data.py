@@ -1,70 +1,75 @@
 import numpy as np
+import pandas as pd
 from sklearn.preprocessing import LabelBinarizer, OneHotEncoder
+from typing import Optional, Tuple
 
 
 def process_data(
-    X, categorical_features=[], label=None, training=True, encoder=None, lb=None
-):
-    """ Process the data used in the machine learning pipeline.
+    X: pd.DataFrame,
+    categorical_features: Optional[list[str]] = None,
+    label: Optional[str] = None,
+    training: bool = True,
+    encoder: Optional[OneHotEncoder] = None,
+    lb: Optional[LabelBinarizer] = None,
+) -> Tuple[np.ndarray, np.ndarray, OneHotEncoder, LabelBinarizer]:
+    """
+    Processes a DataFrame for ML:
+      - one‑hot encodes categorical_features
+      - binarizes label column
 
-    Processes the data using one hot encoding for the categorical features and a
-    label binarizer for the labels. This can be used in either training or
-    inference/validation.
-
-    Note: depending on the type of model used, you may want to add in functionality that
-    scales the continuous data.
-
-    Inputs
-    ------
-    X : pd.DataFrame
-        Dataframe containing the features and label. Columns in `categorical_features`
-    categorical_features: list[str]
-        List containing the names of the categorical features (default=[])
-    label : str
-        Name of the label column in `X`. If None, then an empty array will be returned
-        for y (default=None)
-    training : bool
-        Indicator if training mode or inference/validation mode.
-    encoder : sklearn.preprocessing._encoders.OneHotEncoder
-        Trained sklearn OneHotEncoder, only used if training=False.
-    lb : sklearn.preprocessing._label.LabelBinarizer
-        Trained sklearn LabelBinarizer, only used if training=False.
-
-    Returns
-    -------
-    X : np.array
-        Processed data.
-    y : np.array
-        Processed labels if labeled=True, otherwise empty np.array.
-    encoder : sklearn.preprocessing._encoders.OneHotEncoder
-        Trained OneHotEncoder if training is True, otherwise returns the encoder passed
-        in.
-    lb : sklearn.preprocessing._label.LabelBinarizer
-        Trained LabelBinarizer if training is True, otherwise returns the binarizer
-        passed in.
+    Returns:
+    --------
+    X_out : np.ndarray
+        [n_samples, n_continuous + n_encoded_categorical]
+    y_out : np.ndarray
+        [n_samples,] (empty if label is None)
+    encoder : OneHotEncoder
+    lb : LabelBinarizer
     """
 
+    # avoid mutable defaults
+    if categorical_features is None:
+        categorical_features = []
+
+    # --- 1) extract and drop the label column ---
     if label is not None:
-        y = X[label]
-        X = X.drop([label], axis=1)
+        y_series = X[label]
+        X = X.drop(columns=[label])
     else:
-        y = np.array([])
+        y_series = pd.Series([], dtype=int)
 
-    X_categorical = X[categorical_features].values
-    X_continuous = X.drop(*[categorical_features], axis=1)
+    # --- 2) split out categorical vs continuous and convert to numpy ---
+    X_cat = X[categorical_features].to_numpy()
+    X_cont = X.drop(columns=categorical_features).to_numpy()
 
-    if training is True:
-        encoder = OneHotEncoder(sparse=False, handle_unknown="ignore")
+    # --- 3) fit or transform encoder & label binarizer ---
+    if training:
+        encoder = OneHotEncoder(
+            sparse_output=False,  # new in sklearn ≥ 1.2; replaces `sparse=False`
+            handle_unknown="ignore",
+        )
         lb = LabelBinarizer()
-        X_categorical = encoder.fit_transform(X_categorical)
-        y = lb.fit_transform(y.values).ravel()
-    else:
-        X_categorical = encoder.transform(X_categorical)
-        try:
-            y = lb.transform(y.values).ravel()
-        # Catch the case where y is None because we're doing inference.
-        except AttributeError:
-            pass
 
-    X = np.concatenate([X_continuous, X_categorical], axis=1)
-    return X, y, encoder, lb
+        X_cat = encoder.fit_transform(X_cat)
+        y_arr = lb.fit_transform(y_series)
+
+        # if binary, fit_transform returns shape (n_samples, 1), so flatten:
+        if y_arr.ndim == 2 and y_arr.shape[1] == 1:
+            y_arr = y_arr.ravel()
+    else:
+        if encoder is None or lb is None:
+            raise ValueError("encoder and lb must be provided for inference")
+
+        X_cat = encoder.transform(X_cat)
+
+        if label is not None:
+            y_arr = lb.transform(y_series)
+            if y_arr.ndim == 2 and y_arr.shape[1] == 1:
+                y_arr = y_arr.ravel()
+        else:
+            y_arr = np.array([])
+
+    # --- 4) concatenate back together ---
+    X_out = np.hstack([X_cont, X_cat])
+
+    return X_out, y_arr, encoder, lb

@@ -25,9 +25,9 @@ The evaluation process leverages a test dataset, which constitutes 20% of the Ce
 ## Metrics
 
 The model's performance was evaluated using the following metrics:
-* Precision: 0.76
-* Recall: 0.40
-* F1 Score: 0.52
+* Precision: 0.81
+* Recall: 0.39
+* F1 Score: 0.53
 
 Additionally, performance was analyzed across different categories (refer to `model/metrics_by_slice.csv`). This provides insights into how the model performs for specific values of categorical features.
 
